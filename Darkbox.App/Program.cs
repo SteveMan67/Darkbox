@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using Avalonia.Svg.Skia;
 
 namespace Darkbox;
 

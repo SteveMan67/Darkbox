@@ -10,12 +10,16 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
-        <Folder Include="Modules\" />
+        <Folder Include="Assets\Icons\" />
+        <Folder Include="Modules\Develop\ViewModels\" />
+        <Folder Include="Modules\Develop\Views\" />
+        <Folder Include="Modules\Library\Views\" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="12.0.3" />
         <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="11.3.0" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1">
@@ -23,9 +27,11 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Darkbox.Core\Darkbox.Core.csproj" />
+      <ProjectReference Include="..\Darkbox.Catalog\Darkbox.Catalog.csproj" />
     </ItemGroup>
 </Project>

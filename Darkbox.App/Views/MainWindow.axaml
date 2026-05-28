@@ -3,18 +3,84 @@
         xmlns:vm="using:Darkbox.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="900"
         x:Class="Darkbox.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="Darkbox.App">
+        Title="Darkbox"
+        Background="#1E1E1E"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="BorderOnly">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
+    
+    <DockPanel>
+        <Border DockPanel.Dock="Top"
+                Height="48"
+                PointerPressed="TopBar_PointerPressed">
+            <Grid Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Classes="xl"
+                           Grid.Column="0"
+                           Text="Darkbox"
+                           VerticalAlignment="Center"
+                           Margin="16 0"/>
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="l"
+                                   Text="Library"
+                                   VerticalAlignment="Center"
+                                   Margin="10 0"/>
+                        <TextBlock Classes="l muted"
+                                   FontWeight="Regular"
+                                   Text="Develop"
+                                   VerticalAlignment="Center"
+                                   Margin="10 0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Click="MinimizeButton_Click"
+                                Background="Transparent"
+                                BorderThickness="0">
+                            <Image Width="16"
+                                   Height="16"
+                                   Source="/Assets/Icons/Minimize.png"/>
+                        </Button>
+                        <Button Click="MaximizeButton_Click"
+                                Background="Transparent"
+                                BorderThickness="0">
+                            <Image Width="16"
+                                   Height="16"
+                                   Source="/Assets/Icons/Windowed.png"/>
+                        </Button>
+                        <Button Click="CloseButton_Click"
+                                Background="Transparent"
+                                BorderThickness="0">
+                            <Image Width="16"
+                                   Height="16"
+                                   Source="/Assets/Icons/Close.png"/>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Border Background="#1E1E1E">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="220"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Orientation="Horizontal" Grid.Column="0"></StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Column="2"></StackPanel>
+            </Grid>
+        </Border>
+    </DockPanel>
 </Window>

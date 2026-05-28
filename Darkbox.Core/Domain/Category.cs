@@ -9,5 +9,5 @@ public class Category
     public int? ParentId { get; set; }
     public Category? Parent { get; set; }
     public List<Category> Children { get; set; } = new List<Category>();
-    public List<Shoot> Shoots { get; set; } = new List<Shoot>();
+    public List<Shoot> Shoots { get; set; } = new List<Shoot>(); 
 }
