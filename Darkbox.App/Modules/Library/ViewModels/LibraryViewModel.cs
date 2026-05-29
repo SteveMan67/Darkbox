@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Darkbox.Core.Domain;
 using Darkbox.Core.Interfaces;
@@ -17,29 +19,59 @@ public partial class LibraryViewModel : ViewModelBase
 	}
 	
 	[ObservableProperty]
-	private List<Shoot> _shoots = new();	
+	private ObservableCollection<Shoot> _shoots = new();	
 	
 	[ObservableProperty] 
-	private List<Category> _categories = new();
+	private ObservableCollection<Category> _categories = new();
 
 	[ObservableProperty]
-	private List<Photo> _photos = new();
+	private ObservableCollection<Photo> _photos = new();
 
 	[ObservableProperty] 
 	private Shoot? _selectedShoot;
 
 	[ObservableProperty] 
 	private Shoot? _selectedPhoto;
+    
+	[ObservableProperty]
+	private ObservableCollection<CategoryTreeItemViewModel> _categoryTree = new();
 
 	public async Task LoadAsync()
 	{
-		Shoots = await _catalog.GetAllShoots();
-		Categories = await _catalog.GetAllCategories();
+		var shoots = await _catalog.GetAllShoots();
+		Shoots = new ObservableCollection<Shoot>(shoots);
+		
+		var categories = await _catalog.GetAllCategories();
+		Categories = new ObservableCollection<Category>(categories);
+		CategoryTree = BuildCategoryTree(categories);
 	}
 
 	public async Task LoadPhotosForShoot(Shoot shoot)
 	{
 		SelectedShoot = shoot;
-		Photos = await _catalog.GetPhotosInShoot(shoot.Id);
+		var photos = await _catalog.GetPhotosInShoot(shoot.Id);
+		Photos = new ObservableCollection<Photo>(photos);
+
+	}
+	
+	private ObservableCollection<CategoryTreeItemViewModel> BuildCategoryTree(
+		IEnumerable<Category> categories)
+	{
+		var allItems = categories
+			.Select(c => new CategoryTreeItemViewModel(c))
+			.ToList();
+
+		var lookup = allItems.ToDictionary(i => i.Id);
+		var roots = new ObservableCollection<CategoryTreeItemViewModel>();
+
+		foreach (var item in allItems)
+		{
+			if (item.Category.ParentId.HasValue)
+				lookup[item.Category.ParentId.Value].Children.Add(item);
+			else
+				roots.Add(item);
+		}
+        
+		return roots;
 	}
 }

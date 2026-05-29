@@ -44,7 +44,9 @@
                                    VerticalAlignment="Center"
                                    Margin="10 0"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="10"
+                                Margin="10 0">
                         <Button Click="MinimizeButton_Click"
                                 Background="Transparent"
                                 BorderThickness="0">
@@ -71,16 +73,7 @@
             </Grid>
         </Border>
         <Border Background="#1E1E1E">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="220"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                
-                <StackPanel Orientation="Horizontal" Grid.Column="0"></StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.Column="2"></StackPanel>
-            </Grid>
+            <ContentControl Content="{Binding CurrentView}"></ContentControl>
         </Border>
     </DockPanel>
 </Window>

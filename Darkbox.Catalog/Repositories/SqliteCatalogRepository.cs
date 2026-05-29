@@ -233,6 +233,7 @@ public class SqliteCatalogRepository : ICatalogRepository
                                      $iso, $latitude, $longitude, $isMissing, $driveSerial, $importedAt,
                                      $rating, $isFlagged
                                  )
+                                 RETURNING Id
                               """;
         
         command.Parameters.AddWithValue("$filePath", photo.FilePath);
@@ -255,7 +256,8 @@ public class SqliteCatalogRepository : ICatalogRepository
         command.Parameters.AddWithValue("$rating", photo.Rating);
         command.Parameters.AddWithValue("$isFlagged", photo.IsFlagged ? 1 : 0);
         
-        await command.ExecuteNonQueryAsync();
+        var result =  await command.ExecuteNonQueryAsync();
+        photo.Id = Convert.ToInt32(result.ToString());
     }
     
     public async Task DeletePhoto(int id)
@@ -305,6 +307,7 @@ public class SqliteCatalogRepository : ICatalogRepository
         command.CommandText = """
           INSERT INTO shoots (Name, DateStart, DateEnd, Notes, ImportedAt) 
           VALUES ($name, $dateStart, $dateEnd, $notes, $importedAt);
+          RETURNING Id
           """;
         
         command.Parameters.AddWithValue("$name", shoot.Name);
@@ -312,8 +315,9 @@ public class SqliteCatalogRepository : ICatalogRepository
         command.Parameters.AddWithValue("$dateEnd", shoot.DateEnd.ToString("O"));
         command.Parameters.AddWithValue("$notes", shoot.Notes);
         command.Parameters.AddWithValue("$importedAt", shoot.ImportedAt);
-        
-        await command.ExecuteNonQueryAsync();
+
+        var result = await command.ExecuteNonQueryAsync();
+        shoot.Id = Convert.ToInt32(result);
     }
     
     public async Task<List<Category>> GetAllCategories()
@@ -365,6 +369,23 @@ public class SqliteCatalogRepository : ICatalogRepository
         command.Parameters.AddWithValue("$name", category.Name);
         command.Parameters.AddWithValue("$parentId", category.ParentId.HasValue ? category.ParentId.Value : DBNull.Value);
 
+        await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task AddShootToCategory(int shootId, Category category)
+    {
+        using var connection = GetConnection();
+        await connection.OpenAsync();
+        
+        var command =  connection.CreateCommand();
+        command.CommandText = """
+                              INSERT OR IGNORE INTO ShootCategories (ShootId, CategoryId)
+                              VALUES ($shootId, $categoryId)
+                              """;
+        
+        command.Parameters.AddWithValue("$shootId", shootId);
+        command.Parameters.AddWithValue("$categoryId", category.Id);
+        
         await command.ExecuteNonQueryAsync();
     }
 }

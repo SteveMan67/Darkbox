@@ -1,6 +1,19 @@
-﻿namespace Darkbox.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Darkbox.Modules.Library.ViewModels;
+
+namespace Darkbox.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public string Greeting { get; } = "This is a HELP I'M STUCK simple placeholder";
+    [ObservableProperty]
+    private ViewModelBase _currentView;
+
+    public LibraryViewModel Library { get; }
+
+    public MainWindowViewModel(LibraryViewModel library)
+    {
+        Library = library;
+        _currentView = library;
+        _ = library.LoadAsync();
+    }
 }

@@ -13,7 +13,6 @@
         <Folder Include="Assets\Icons\" />
         <Folder Include="Modules\Develop\ViewModels\" />
         <Folder Include="Modules\Develop\Views\" />
-        <Folder Include="Modules\Library\Views\" />
     </ItemGroup>
 
     <ItemGroup>

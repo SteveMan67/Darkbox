@@ -9,6 +9,6 @@ public class Shoot
     public string Notes { get; set; } = string.Empty;
     public DateTime ImportedAt { get; set; }
     
-    // woah we refererence the Photo class coolio
+    // woah we reference the Photo class coolio
     public List<Photo> Photos { get; set; } = new List<Photo>();
 }

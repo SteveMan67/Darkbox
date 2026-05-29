@@ -53,7 +53,8 @@ public partial class App : Application
         services.AddSingleton<ICatalogRepository, SqliteCatalogRepository>(
             _ => new SqliteCatalogRepository(connectionString)
         );
-        services.AddTransient<MainWindowViewModel>();
         services.AddTransient<LibraryViewModel>();
+        services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<IImportService, IImportService>();
     }
 }
