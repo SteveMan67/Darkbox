@@ -3,6 +3,7 @@
         xmlns:vm="using:Darkbox.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:Darkbox.Views"
         mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="900"
         x:Class="Darkbox.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -75,5 +76,6 @@
         <Border Background="#1E1E1E">
             <ContentControl Content="{Binding CurrentView}"></ContentControl>
         </Border>
+        <views:ImportDialogView IsVisible="{Binding IsImportDialogOpen}"/>
     </DockPanel>
 </Window>

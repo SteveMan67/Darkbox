@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using Darkbox.Catalog.Database;
 using Darkbox.Catalog.Repositories;
 using Darkbox.Core.Interfaces;
+using Darkbox.Core.Services;
 using Darkbox.Modules.Library.ViewModels;
 using Darkbox.ViewModels;
 using Darkbox.Views;
@@ -55,6 +56,6 @@ public partial class App : Application
         );
         services.AddTransient<LibraryViewModel>();
         services.AddTransient<MainWindowViewModel>();
-        services.AddTransient<IImportService, IImportService>();
+        services.AddTransient<IImportService, ImportService>();
     }
 }

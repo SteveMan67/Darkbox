@@ -1,0 +1,46 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Darkbox.Views.ImportDialogView">
+    <Grid>
+        <Rectangle Fill="#56000000"/>
+        <Border Background="#1E1E1E"
+                CornerRadius="8"
+                Margin="64">
+            <Grid ColumnDefinitions="250, *, 300" Margin="16">
+                <Grid Grid.Column="0" RowDefinitions="Auto, *">
+                    <TextBlock Classes="xl"
+                               Grid.Row="0"
+                               Text="Locations"
+                               Margin="0, 0, 0 16"/>
+                    <TreeView Grid.Row="1">
+                        <TreeViewItem Header="LOCAL DISK C:\" IsExpanded="False">
+                            <TreeViewItem Header="Photos" />
+                            <TreeViewItem Header="Downloads" />
+                        </TreeViewItem>
+                        <TreeViewItem Header="EOS DIGITAL D:\" IsExpanded="True">
+                            <TreeViewItem Header="DCIM">
+                                <TreeViewItem Header="100CANON"/>
+                                <TreeViewItem Header="EOSMISC"/>
+                            </TreeViewItem>
+                            <TreeViewItem Header="MISC" />
+                        </TreeViewItem>
+                    </TreeView>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Border Background="#121212"
+                            Margin="0 0"
+                            CornerRadius="7"></Border>
+                </Grid>
+                <Grid Grid.Column="2" RowDefinitions="*, 50, 50">
+                    <StackPanel Grid.Row="0"
+                                Orientation="Vertical">
+                        <Border Background="#E0E0E0"
+                                Margin="20 0 0 0"
+                                Height="200">
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
