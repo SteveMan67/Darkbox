@@ -98,7 +98,7 @@ public class ImportService : IImportService
 
             processedCount++;
 
-            var percentage = (int)(double)processedCount / photos.Count;
+            var percentage = (int)((double)processedCount / photos.Count * 100);
             progress?.Report(percentage);
         }
     }
@@ -126,7 +126,7 @@ public class ImportService : IImportService
         {
             var currentPhoto = sortedPhotos[i];
             var previousPhoto = sortedPhotos[i - 1];
-            TimeSpan timeDifference = previousPhoto.CaptureTime - currentPhoto.CaptureTime;
+            TimeSpan timeDifference = currentPhoto.CaptureTime - previousPhoto.CaptureTime;
             
             if (timeDifference.TotalHours >= 6.0)
             {

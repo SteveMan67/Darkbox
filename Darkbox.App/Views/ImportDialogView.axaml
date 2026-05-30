@@ -1,6 +1,8 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Darkbox.Views.ImportDialogView">
+             xmlns:vm="using:Darkbox.ViewModels"
+             x:Class="Darkbox.Views.ImportDialogView"
+             x:DataType="vm:ImportDialogViewModel">
     <Grid>
         <Rectangle Fill="#56000000"/>
         <Border Background="#1E1E1E"
@@ -12,18 +14,19 @@
                                Grid.Row="0"
                                Text="Locations"
                                Margin="0, 0, 0 16"/>
-                    <TreeView Grid.Row="1">
-                        <TreeViewItem Header="LOCAL DISK C:\" IsExpanded="False">
-                            <TreeViewItem Header="Photos" />
-                            <TreeViewItem Header="Downloads" />
-                        </TreeViewItem>
-                        <TreeViewItem Header="EOS DIGITAL D:\" IsExpanded="True">
-                            <TreeViewItem Header="DCIM">
-                                <TreeViewItem Header="100CANON"/>
-                                <TreeViewItem Header="EOSMISC"/>
-                            </TreeViewItem>
-                            <TreeViewItem Header="MISC" />
-                        </TreeViewItem>
+                    <TreeView Grid.Row="1" ItemsSource="{Binding Drives}"
+                              SelectedItem="{Binding SelectedFolder}">
+                        <TreeView.Styles>
+                            <Style Selector="TreeViewItem" x:DataType="vm:FileSystemItemViewModel">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            </Style>
+                        </TreeView.Styles>
+                        
+                        <TreeView.ItemTemplate>
+                            <TreeDataTemplate ItemsSource="{Binding Subfolders}">
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </TreeDataTemplate>
+                        </TreeView.ItemTemplate>
                     </TreeView>
                 </Grid>
                 <Grid Grid.Column="1">

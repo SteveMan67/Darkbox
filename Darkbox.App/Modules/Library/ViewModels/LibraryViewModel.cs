@@ -31,7 +31,7 @@ public partial class LibraryViewModel : ViewModelBase
 	private Shoot? _selectedShoot;
 
 	[ObservableProperty] 
-	private Shoot? _selectedPhoto;
+	private Photo? _selectedPhoto;
     
 	[ObservableProperty]
 	private ObservableCollection<CategoryTreeItemViewModel> _categoryTree = new();
