@@ -8,13 +8,22 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private ViewModelBase _currentView;
 
-    [ObservableProperty] private bool _isImportDialogOpen = true;
-
     public LibraryViewModel Library { get; }
+    
+    [ObservableProperty] private bool _isImportDialogOpen;
+    
+    public ImportDialogViewModel ImportDialog { get; }
 
-    public MainWindowViewModel(LibraryViewModel library)
+    public MainWindowViewModel(LibraryViewModel library, ImportDialogViewModel importDialog)
     {
         Library = library;
+        
+        Library.ImportDialogRequested += () =>
+        {
+            IsImportDialogOpen = true;
+        };
+        
+        ImportDialog = importDialog;
         _currentView = library;
         _ = library.LoadAsync();
     }

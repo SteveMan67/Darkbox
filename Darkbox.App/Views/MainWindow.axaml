@@ -16,66 +16,72 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
     
-    <DockPanel>
-        <Border DockPanel.Dock="Top"
-                Height="48"
-                PointerPressed="TopBar_PointerPressed">
-            <Grid Background="Transparent">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock Classes="xl"
-                           Grid.Column="0"
-                           Text="Darkbox"
-                           VerticalAlignment="Center"
-                           Margin="16 0"/>
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Classes="l"
-                                   Text="Library"
-                                   VerticalAlignment="Center"
-                                   Margin="10 0"/>
-                        <TextBlock Classes="l muted"
-                                   FontWeight="Regular"
-                                   Text="Develop"
-                                   VerticalAlignment="Center"
-                                   Margin="10 0"/>
+    <Grid>
+        <DockPanel>
+            <Border DockPanel.Dock="Top"
+                    Height="48"
+                    PointerPressed="TopBar_PointerPressed">
+                <Grid Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Classes="xl"
+                               Grid.Column="0"
+                               Text="Darkbox"
+                               VerticalAlignment="Center"
+                               Margin="16 0"/>
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Classes="l"
+                                       Text="Library"
+                                       VerticalAlignment="Center"
+                                       Margin="10 0"/>
+                            <TextBlock Classes="l muted"
+                                       FontWeight="Regular"
+                                       Text="Develop"
+                                       VerticalAlignment="Center"
+                                       Margin="10 0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="10"
+                                    Margin="10 0">
+                            <Button Click="MinimizeButton_Click"
+                                    Background="Transparent"
+                                    BorderThickness="0">
+                                <Image Width="16"
+                                       Height="16"
+                                       Source="/Assets/Icons/Minimize.png"/>
+                            </Button>
+                            <Button Click="MaximizeButton_Click"
+                                    Background="Transparent"
+                                    BorderThickness="0">
+                                <Image Width="16"
+                                       Height="16"
+                                       Source="/Assets/Icons/Windowed.png"/>
+                            </Button>
+                            <Button Click="CloseButton_Click"
+                                    Background="Transparent"
+                                    BorderThickness="0">
+                                <Image Width="16"
+                                       Height="16"
+                                       Source="/Assets/Icons/Close.png"/>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="10"
-                                Margin="10 0">
-                        <Button Click="MinimizeButton_Click"
-                                Background="Transparent"
-                                BorderThickness="0">
-                            <Image Width="16"
-                                   Height="16"
-                                   Source="/Assets/Icons/Minimize.png"/>
-                        </Button>
-                        <Button Click="MaximizeButton_Click"
-                                Background="Transparent"
-                                BorderThickness="0">
-                            <Image Width="16"
-                                   Height="16"
-                                   Source="/Assets/Icons/Windowed.png"/>
-                        </Button>
-                        <Button Click="CloseButton_Click"
-                                Background="Transparent"
-                                BorderThickness="0">
-                            <Image Width="16"
-                                   Height="16"
-                                   Source="/Assets/Icons/Close.png"/>
-                        </Button>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
+                </Grid>
+            </Border>
+            <Border Background="#1E1E1E">
+                <ContentControl Content="{Binding CurrentView}"></ContentControl>
+            </Border>
+        </DockPanel>
+        
+        <Border IsVisible="{Binding IsImportDialogOpen}"
+                Background="#56000000">
+            <views:ImportDialogView DataContext="{Binding ImportDialog}"/>
         </Border>
-        <Border Background="#1E1E1E">
-            <ContentControl Content="{Binding CurrentView}"></ContentControl>
-        </Border>
-        <views:ImportDialogView IsVisible="{Binding IsImportDialogOpen}"/>
-    </DockPanel>
+    </Grid>
 </Window>

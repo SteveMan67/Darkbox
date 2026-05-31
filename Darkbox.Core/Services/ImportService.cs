@@ -3,8 +3,10 @@ using Darkbox.Core.Domain;
 using Darkbox.Core.Interfaces;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
-using MetadataExtractor.Util;
 using Directory = System.IO.Directory;
+using ImageMagick;
+using ImageMagick.Formats;
+using ImageMagick.Configuration;
 
 namespace Darkbox.Core.Services;
 
@@ -33,7 +35,7 @@ public class ImportService : IImportService
         // Pentax
         ".PEF", ".DNG",
         // Leica
-        ".DNG", ".RWL",
+        ".RWL",
         // Samsung
         ".SRW",
         // Sigma
@@ -53,53 +55,129 @@ public class ImportService : IImportService
         
         var photos =  new List<Photo>();
 
-        var allFiles = System.IO.Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories);
-
-        foreach (var rawFile in allFiles)
+        try
         {
-            if (RawExtensions.Contains(Path.GetExtension(rawFile).ToUpper()))
+            var allFiles = Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories);
+
+            foreach (var rawFile in allFiles)
             {
-                photos.Add(new Photo
-                {
-                    FilePath = rawFile
-                });
+                    if (RawExtensions.Contains(Path.GetExtension(rawFile).ToUpper()))
+                    {
+                        photos.Add(new Photo
+                        {
+                            FilePath = rawFile
+                        });
+                    }
             }
+            }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return photos;
         }
+        
 
         return photos;
     }
 
     public async Task ReadCaptureTime(List<Photo> photos, IProgress<int> progress)
     {
-        int processedCount = 0;
-
-        foreach (var photo in photos)
+        await Task.Run(() =>
         {
-            try
+            int processedCount = 0;
+
+            Parallel.ForEach(photos, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                photo =>
+                {
+                    try
+                    {
+                        var directories = ImageMetadataReader.ReadMetadata(photo.FilePath);
+
+                        var subIfdDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
+
+                        if (subIfdDirectory != null &&
+                            subIfdDirectory.TryGetDateTime(ExifDirectoryBase.TagDateTimeOriginal, out var captureTime))
+                        {
+                            photo.CaptureTime = captureTime;
+                        }
+                        else
+                        {
+                            photo.CaptureTime = File.GetCreationTime(photo.FilePath);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        photo.CaptureTime = File.GetCreationTime(photo.FilePath);
+                    }
+
+                    processedCount++;
+
+                    var percentage = (int)((double)processedCount / photos.Count * 100);
+                    progress?.Report(percentage);
+                });
+
+        });
+    }
+
+    public byte[]? GetEmbeddedPreviewBytes(string filePath)
+    {
+        ResourceLimits.Thread = 1;
+
+        OpenCL.IsEnabled = false;
+        try
+        {
+            var directories = ImageMetadataReader.ReadMetadata(filePath);
+
+            foreach (var directory in directories)
             {
-                var directories = ImageMetadataReader.ReadMetadata(photo.FilePath);
+                long offset = GetTagValueAsLong(directory, 0x0201);
+                long length = GetTagValueAsLong(directory, 0x0202);
 
-                var subIfdDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
-
-                if (subIfdDirectory != null &&
-                    subIfdDirectory.TryGetDateTime(ExifDirectoryBase.TagDateTimeOriginal, out var captureTime))
+                if (offset == 0 || length == 0)
                 {
-                    photo.CaptureTime = captureTime;
+                    offset = GetTagArrayFirstValueAsLong(directory, 0x0111);
+                    length = GetTagArrayFirstValueAsLong(directory, 0x0117);
                 }
-                else
+
+                if (offset > 0 && length > 0)
                 {
-                    photo.CaptureTime = File.GetCreationTime(photo.FilePath);
+                    using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    stream.Seek(offset, SeekOrigin.Begin);
+
+                    var buffer = new byte[length];
+                    stream.Read(buffer, 0, (int)length);
+
+                    if (buffer.Length >= 2 && buffer[0] == 0xFF && buffer[1] == 0xD8)
+                    {
+                        Debug.WriteLine($"Found embedded JPEG for {filePath}");
+                        return buffer;
+                    }
                 }
             }
-            catch (Exception)
+
+            Debug.WriteLine($"Falling back to ImageMagick for {filePath}");
+            
+            var settings = new MagickReadSettings(new DngReadDefines() { UseCameraWhiteBalance = true })
             {
-                photo.CaptureTime = File.GetCreationTime(photo.FilePath);
-            }
+                Width = 300, Height = 300
+            };
+            
+            using var image = new MagickImage(filePath, settings);
+            image.Format = MagickFormat.Jpeg;
+            image.Quality = 75;
+            
+            if (image.Width > 300 || image.Height > 300)
+                    image.Resize(new MagickGeometry(300, 300) { IgnoreAspectRatio = false });
 
-            processedCount++;
-
-            var percentage = (int)((double)processedCount / photos.Count * 100);
-            progress?.Report(percentage);
+            var result =  image.ToByteArray();
+            
+            return result;
+            
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to extract thumbnail for {filePath}: {ex.Message}");
+            return null;
         }
     }
 
@@ -269,6 +347,36 @@ public class ImportService : IImportService
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
+        }
+    }
+
+    private long GetTagValueAsLong(MetadataExtractor.Directory dir, int tagId)
+    {
+        if (!dir.ContainsTag(tagId)) return 0;
+        try
+        {
+            return Convert.ToInt64(dir.GetObject(tagId));
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    private long GetTagArrayFirstValueAsLong(MetadataExtractor.Directory dir, int tagId)
+    {
+        if (!dir.ContainsTag(tagId)) return 0;
+        try
+        {
+            var obj = dir.GetObject(tagId);
+            if (obj is int[] intArray && intArray.Length > 0) return intArray[0];
+            if (obj is long[] longArray && longArray.Length > 0) return longArray[0];
+            if (obj is uint[] uintArray && uintArray.Length > 0) return uintArray[0];
+            return Convert.ToInt64(obj);
+        }
+        catch
+        {
+            return 0;
         }
     }
 }

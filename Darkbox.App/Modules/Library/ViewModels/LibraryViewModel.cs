@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Darkbox.Core.Domain;
 using Darkbox.Core.Interfaces;
 using Darkbox.ViewModels;
@@ -13,9 +15,21 @@ public partial class LibraryViewModel : ViewModelBase
 {
 	private readonly ICatalogRepository _catalog;
 	
-	public LibraryViewModel(ICatalogRepository catalog)
+	public ImportDialogViewModel ImportDialog { get; }
+	
+	public LibraryViewModel(ICatalogRepository catalog,  ImportDialogViewModel importDialog)
 	{
 		_catalog = catalog;
+		ImportDialog = importDialog;
+		_ = LoadAsync();
+	}
+	
+	public event Action?  ImportDialogRequested;
+
+	[RelayCommand]
+	private void OpenImportDialog()
+	{	
+		ImportDialogRequested?.Invoke();
 	}
 	
 	[ObservableProperty]
@@ -74,4 +88,5 @@ public partial class LibraryViewModel : ViewModelBase
         
 		return roots;
 	}
+	
 }

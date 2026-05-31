@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Darkbox.Modules.Library.ViewModels"
+             xmlns:views="using:Darkbox.Modules.Library.Views"
+             xmlns:views1="clr-namespace:Darkbox.Views"
              x:DataType="vm:LibraryViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Darkbox.Modules.Library.Views.LibraryView">
@@ -10,5 +12,17 @@
     <Design.DataContext>
         <vm:LibraryViewModel/>
     </Design.DataContext>
+    
+    <Grid ColumnDefinitions="250, *, 250">
+        <Grid RowDefinitions="*, 50">
+           <StackPanel Grid.Row="1"
+                       Orientation="Horizontal">
+               <Button Command="{Binding OpenImportDialogCommand}">
+                   <TextBlock Text="Import"
+                       ></TextBlock>
+               </Button>
+           </StackPanel> 
+        </Grid>
+    </Grid>
 </UserControl>
 

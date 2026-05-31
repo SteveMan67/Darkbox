@@ -16,6 +16,7 @@ namespace Darkbox;
 
 public partial class App : Application
 {
+    public static IServiceProvider? Services { get; private set; }
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -26,6 +27,8 @@ public partial class App : Application
         var services = new ServiceCollection();
         ConfigureServices(services);
         var provider = services.BuildServiceProvider();
+
+        Services = provider;
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -57,5 +60,9 @@ public partial class App : Application
         services.AddTransient<LibraryViewModel>();
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<IImportService, ImportService>();
+        
+        services.AddTransient<IFileSystemService, FileSystemService>();
+        
+        services.AddTransient<ImportDialogViewModel>();
     }
 }

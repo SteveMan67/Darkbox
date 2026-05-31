@@ -10,5 +10,5 @@ public class Shoot
     public DateTime ImportedAt { get; set; }
     
     // woah we reference the Photo class coolio
-    public List<Photo> Photos { get; set; } = new List<Photo>();
+    public List<Photo> Photos { get; set; } = new();
 }

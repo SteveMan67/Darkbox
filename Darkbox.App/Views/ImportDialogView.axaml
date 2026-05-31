@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Darkbox.ViewModels"
+             xmlns:domain="using:Darkbox.Core.Domain"
              x:Class="Darkbox.Views.ImportDialogView"
              x:DataType="vm:ImportDialogViewModel">
     <Grid>
@@ -32,7 +33,37 @@
                 <Grid Grid.Column="1">
                     <Border Background="#121212"
                             Margin="0 0"
-                            CornerRadius="7"></Border>
+                            CornerRadius="7">
+                        <ScrollViewer>
+                            <ListBox ItemsSource="{Binding Photos}"
+                                     Background="Transparent">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:PhotoPreviewViewModel">
+                                        <Border Width="150"
+                                                Height="150"
+                                                Margin="5"
+                                                Background="#333333"
+                                                CornerRadius="4"
+                                                AttachedToVisualTree="ImageContainer_AttachedToVisualTree">
+                                            <Grid>
+                                                <Image Source="{Binding PreviewImage}" Stretch="UniformToFill"/>
+                                                <TextBlock Text="Loading..."
+                                                           IsVisible="{Binding PreviewImage, Converter={x:Static ObjectConverters.IsNull}}"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="#E0E0E0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
+                    </Border>
                 </Grid>
                 <Grid Grid.Column="2" RowDefinitions="*, 50, 50">
                     <StackPanel Grid.Row="0"
