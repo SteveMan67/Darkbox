@@ -181,6 +181,16 @@ public class ImportService : IImportService
         }
     }
 
+    public Task GetPhotoSizes(List<Photo> photos)
+    {
+        foreach (var photo in photos)
+        {
+            photo.FileSizeInBytes = new FileInfo(photo.FilePath).Length;
+        }
+        
+        return Task.CompletedTask;
+    }
+
     public List<Shoot> GroupByShoot(List<Photo> photos)
     {
         if (photos == null || photos.Count == 0)
@@ -305,12 +315,19 @@ public class ImportService : IImportService
     {
         try
         {
-
+            photo.FileSizeInBytes = new FileInfo(photo.FilePath).Length;
             var directories = ImageMetadataReader.ReadMetadata(photo.FilePath);
             var subIfdDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
             if (subIfdDirectory != null)
             {
                 photo.Lens = subIfdDirectory.GetString(ExifDirectoryBase.TagLensModel) ?? String.Empty;
+                
+                if (string.IsNullOrEmpty(photo.Lens))
+                {
+                    var lensSpec = subIfdDirectory.GetString(ExifDirectoryBase.TagLensSpecification);
+                    if (!string.IsNullOrEmpty(lensSpec))
+                        photo.Lens = lensSpec;
+                }
 
                 if (subIfdDirectory.TryGetDouble(ExifDirectoryBase.TagFocalLength, out var focalLength))
                     photo.FocalLength = focalLength;
@@ -320,10 +337,6 @@ public class ImportService : IImportService
                     photo.ShutterSpeed = exposureTime;
                 if (subIfdDirectory.TryGetInt32(ExifDirectoryBase.TagIsoEquivalent, out var iso))
                     photo.Iso = iso;
-                if (subIfdDirectory.TryGetInt32(ExifDirectoryBase.TagExifImageWidth, out var width))
-                    photo.Width = width;
-                if (subIfdDirectory.TryGetInt32(ExifDirectoryBase.TagExifImageHeight, out var height))
-                    photo.Height = height;
             }
 
             var ifd0Directory = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
@@ -332,6 +345,11 @@ public class ImportService : IImportService
                 var make = ifd0Directory.GetString(ExifDirectoryBase.TagMake)?.Trim() ?? "";
                 var model = ifd0Directory.GetString(ExifDirectoryBase.TagModel)?.Trim() ?? "";
                 photo.Camera = string.IsNullOrWhiteSpace(make) ? model : $"{make} {model}".Trim();
+                
+                if (ifd0Directory.TryGetInt32(ExifDirectoryBase.TagImageWidth, out var width))
+                    photo.Width = width;
+                if (ifd0Directory.TryGetInt32(ExifDirectoryBase.TagImageHeight, out var height))
+                    photo.Height = height;
             }
 
             var gpsDirectory = directories.OfType<GpsDirectory>().FirstOrDefault();

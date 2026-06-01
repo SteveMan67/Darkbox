@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Darkbox.ViewModels"
+             xmlns:models="using:Darkbox.Models"
              xmlns:domain="using:Darkbox.Core.Domain"
              x:Class="Darkbox.Views.ImportDialogView"
              x:DataType="vm:ImportDialogViewModel">
@@ -39,40 +40,75 @@
                                      Background="Transparent">
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal" />
+                                        <UniformGrid Columns="{Binding ColumnCount}"/>
                                     </ItemsPanelTemplate>
                                 </ListBox.ItemsPanel>
                                 
                                 <ListBox.ItemTemplate>
                                     <DataTemplate x:DataType="vm:PhotoPreviewViewModel">
-                                        <Border Width="150"
-                                                Height="150"
-                                                Margin="5"
+                                        <Button Command="{Binding SelectCommand}"
+                                                Height="{Binding $self.Bounds.Width}"
+                                                Cursor="Hand"
                                                 Background="#333333"
                                                 CornerRadius="4"
+                                                HorizontalAlignment="Stretch"
                                                 AttachedToVisualTree="ImageContainer_AttachedToVisualTree">
                                             <Grid>
-                                                <Image Source="{Binding PreviewImage}" Stretch="UniformToFill"/>
+                                                <Image Source="{Binding PreviewImage}"
+                                                       Stretch="UniformToFill"/>
                                                 <TextBlock Text="Loading..."
                                                            IsVisible="{Binding PreviewImage, Converter={x:Static ObjectConverters.IsNull}}"
                                                            VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"
                                                            Foreground="#E0E0E0"/>
                                             </Grid>
-                                        </Border>
+                                        </Button>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </ScrollViewer>
                     </Border>
                 </Grid>
-                <Grid Grid.Column="2" RowDefinitions="*, 50, 50">
-                    <StackPanel Grid.Row="0"
-                                Orientation="Vertical">
-                        <Border Background="#E0E0E0"
-                                Margin="20 0 0 0"
-                                Height="200">
+                <Grid Grid.Column="2" RowDefinitions="Auto, *">
+                        <Border 
+                                Height="200"
+                                Margin="2"
+                                CornerRadius="4"
+                                ClipToBounds="True">
+                            <Image Source="{Binding SelectedPhoto.PreviewImage}"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
                         </Border>
-                    </StackPanel>
+                    <ScrollViewer Grid.Row="1">
+                        <StackPanel Margin="8">
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="16">
+                                <TextBlock Text="{Binding Aperture}" Classes="muted"/>
+                                <TextBlock Text="{Binding FocalLength}" Classes="muted"/>
+                                <TextBlock Text="{Binding Iso}" Classes="muted"/>
+                                <TextBlock Text="{Binding ShutterSpeed}" Classes="muted"/>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding Metadata}"
+                                          Margin="5 0 0 0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:MetadataItem">
+                                        <Grid ColumnDefinitions="Auto,*"
+                                              Margin="0 8">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Label}"
+                                                       Classes="muted"
+                                                       Margin="0 0 16 0"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Value}"
+                                                       HorizontalAlignment="Right"
+                                                       TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </Grid>
         </Border>
