@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Darkbox.Core.Interfaces;
 using System.Linq;
 using System.Threading.Tasks;
 using Darkbox.Models;
+using Darkbox.Modules.Library.ViewModels;
+using Darkbox.ViewModels;
 
 
-namespace Darkbox.ViewModels;
+namespace Darkbox.Modules.Library.ViewModels;
 
 public partial class ImportDialogViewModel : ViewModelBase
 {
     private readonly IFileSystemService _fileSystemService;
     private readonly IImportService _importService;
 
+    [ObservableProperty]
+    private ObservableCollection<PhotoShootViewModel>? _photoShoots;
+
     public ObservableCollection<FileSystemItemViewModel> Drives { get; } = new();
     
     [ObservableProperty] private FileSystemItemViewModel? _selectedFolder;
 
-    [ObservableProperty]
-    private ObservableCollection<PhotoPreviewViewModel> _photos = new();
-    
     public ImportDialogViewModel(IFileSystemService fileSystemService, IImportService importService)
     {
         _fileSystemService = fileSystemService;
@@ -40,12 +43,14 @@ public partial class ImportDialogViewModel : ViewModelBase
         SelectedPhoto = photo;
         UpdateMetadata(photo);
     }
+    
+    
 
     async partial void OnSelectedFolderChanged(FileSystemItemViewModel? value)
     {
         if (value == null) return;
 
-        var loadedPhotos = await Task.Run(async () =>
+        var photosInFolder = await Task.Run(async () =>
         {
             var photosInFolder = _importService.GetRawPhotosInFolder(value.FullPath);
             IProgress<int> progress = new Progress<int>(percent => Console.WriteLine($"Progress: {percent}%"));
@@ -53,19 +58,19 @@ public partial class ImportDialogViewModel : ViewModelBase
             await _importService.ReadCaptureTime(photosInFolder, progress);
             await _importService.GetPhotoSizes(photosInFolder);
 
-            return photosInFolder
-                .OrderBy(p => p.CaptureTime)
-                .Select(p =>
-                {
-                   var vm =  new PhotoPreviewViewModel(p);
-                   vm.Selected += OnPhotoSelected;
-                   return vm;
-                })
-                .ToList();
-
+            return photosInFolder;
         });
         
-        Photos = new ObservableCollection<PhotoPreviewViewModel>(loadedPhotos);
+        var shoots = _importService.GroupByShoot(photosInFolder)
+            .Select(s =>
+            {
+                var vm = new PhotoShootViewModel(s);
+                vm.PhotoSelected += OnPhotoSelected;
+                return vm;
+            })
+            .ToList();
+            
+        PhotoShoots = new ObservableCollection<PhotoShootViewModel>(shoots);
     }
 
     private void LoadRootDrives()
@@ -105,7 +110,7 @@ public partial class ImportDialogViewModel : ViewModelBase
             new MetadataItem { Label = "File Size", Value = FormatFileSize(p.FileSizeInBytes) },
             new MetadataItem { Label = "Location", Value = p.FilePath },
         };
-        Aperture = $"f{p.Aperture}";
+        Aperture = $"f{Math.Round(p.Aperture, 1)}";
         FocalLength = $"{p.FocalLength}mm";
         Iso = $"ISO {p.Iso}";
         ShutterSpeed = FormatShutterSpeed(p.ShutterSpeed);

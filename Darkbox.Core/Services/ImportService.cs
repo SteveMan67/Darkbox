@@ -104,6 +104,16 @@ public class ImportService : IImportService
                         {
                             photo.CaptureTime = File.GetCreationTime(photo.FilePath);
                         }
+                        
+                        var ifd0Directory =  directories.OfType<ExifIfd0Directory>().FirstOrDefault();
+
+                        if (ifd0Directory != null)
+                        {
+                            if (ifd0Directory.TryGetInt32(ExifDirectoryBase.TagOrientation, out var orientation))
+                            {
+                                photo.Orientation = orientation;
+                            }
+                        }
                     }
                     catch (Exception)
                     {
@@ -345,6 +355,7 @@ public class ImportService : IImportService
                 var make = ifd0Directory.GetString(ExifDirectoryBase.TagMake)?.Trim() ?? "";
                 var model = ifd0Directory.GetString(ExifDirectoryBase.TagModel)?.Trim() ?? "";
                 photo.Camera = string.IsNullOrWhiteSpace(make) ? model : $"{make} {model}".Trim();
+                
                 
                 if (ifd0Directory.TryGetInt32(ExifDirectoryBase.TagImageWidth, out var width))
                     photo.Width = width;

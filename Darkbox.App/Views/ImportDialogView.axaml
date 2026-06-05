@@ -1,8 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:Darkbox.ViewModels"
-             xmlns:models="using:Darkbox.Models"
-             xmlns:domain="using:Darkbox.Core.Domain"
+             xmlns:vm="using:Darkbox.Modules.Library.ViewModels"
+             xmlns:models="clr-namespace:Darkbox.Models"
              x:Class="Darkbox.Views.ImportDialogView"
              x:DataType="vm:ImportDialogViewModel">
     <Grid>
@@ -35,62 +34,95 @@
                     <Border Background="#121212"
                             Margin="0 0"
                             CornerRadius="7">
-                        <ScrollViewer>
-                            <ListBox ItemsSource="{Binding Photos}"
-                                     Background="Transparent">
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="{Binding ColumnCount}"/>
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                                
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:PhotoPreviewViewModel">
-                                        <Button Command="{Binding SelectCommand}"
-                                                Height="{Binding $self.Bounds.Width}"
-                                                Cursor="Hand"
-                                                Background="#333333"
-                                                CornerRadius="4"
-                                                HorizontalAlignment="Stretch"
-                                                AttachedToVisualTree="ImageContainer_AttachedToVisualTree">
-                                            <Grid>
-                                                <Image Source="{Binding PreviewImage}"
-                                                       Stretch="UniformToFill"/>
-                                                <TextBlock Text="Loading..."
-                                                           IsVisible="{Binding PreviewImage, Converter={x:Static ObjectConverters.IsNull}}"
-                                                           VerticalAlignment="Center"
-                                                           HorizontalAlignment="Center"
-                                                           Foreground="#E0E0E0"/>
+                        <ScrollViewer Margin="15 0">
+                            <ItemsControl ItemsSource="{Binding PhotoShoots}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:PhotoShootViewModel">
+                                        <StackPanel Orientation="Vertical">
+                                            <Grid Margin="0 7">
+                                                <TextBox Text="{Binding Name}"
+                                                         Background="Transparent"
+                                                         BorderThickness="0"
+                                                         FontWeight="Bold"/>
                                             </Grid>
-                                        </Button>
+                                            
+                                            <ItemsControl ItemsSource="{Binding Photos}"
+                                                          IsVisible="{Binding IsExpanded}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid Columns="5"></UniformGrid>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:PhotoPreviewViewModel">
+                                                        <Button Command="{Binding SelectCommand}"
+                                                                Height="{Binding $self.Bounds.Width}"
+                                                                Cursor="Hand"
+                                                                Background="#333333"
+                                                                CornerRadius="4"
+                                                                HorizontalAlignment="Stretch"
+                                                                Padding="0"
+                                                                ClipToBounds="True"
+                                                                AttachedToVisualTree="ImageContainer_AttachedToVisualTree"
+                                                                Margin="5">
+                                                            
+                                                            <Border CornerRadius="4" ClipToBounds="True" Classes.selected="{Binding IsSelected}">
+                                                                <Border.Styles>
+                                                                    <Style Selector="Border">
+                                                                        <Setter Property="BorderThickness" Value="0"/>
+                                                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                                                    </Style>
+                                                                    
+                                                                    <Style Selector="Border.selected">
+                                                                        <Setter Property="BorderThickness" Value="3"/>
+                                                                        <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                                                    </Style>
+                                                                </Border.Styles>
+                                                                <Grid>
+                                                                    <Image Source="{Binding PreviewImage}"
+                                                                           Stretch="UniformToFill"/>
+                                                                    <TextBlock Text="Loading..."
+                                                                               IsVisible="{Binding PreviewImage, Converter={x:Static ObjectConverters.IsNull}}"
+                                                                               VerticalAlignment="Center"
+                                                                               HorizontalAlignment="Center"
+                                                                               Foreground="#E0E0E0"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </ScrollViewer>
                     </Border>
                 </Grid>
-                <Grid Grid.Column="2" RowDefinitions="Auto, *">
-                        <Border 
-                                Height="200"
-                                Margin="2"
-                                CornerRadius="4"
-                                ClipToBounds="True">
-                            <Image Source="{Binding SelectedPhoto.PreviewImage}"
-                                   Stretch="Uniform"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
-                        </Border>
+                <Grid Grid.Column="2" 
+                      RowDefinitions="Auto, *, 100"
+                      Margin="8 0 0 0">
+                    <Border 
+                            Height="200"
+                            Margin="2"
+                            CornerRadius="4"
+                            ClipToBounds="True">
+                        <Image Source="{Binding SelectedPhoto.PreviewImage}"
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                    </Border>
                     <ScrollViewer Grid.Row="1">
-                        <StackPanel Margin="8">
-                            <StackPanel Orientation="Horizontal"
-                                        Spacing="16">
-                                <TextBlock Text="{Binding Aperture}" Classes="muted"/>
-                                <TextBlock Text="{Binding FocalLength}" Classes="muted"/>
-                                <TextBlock Text="{Binding Iso}" Classes="muted"/>
-                                <TextBlock Text="{Binding ShutterSpeed}" Classes="muted"/>
-                            </StackPanel>
+                        <StackPanel Margin="5 0 0 0">
+                            <Grid ColumnDefinitions="* * * *"
+                                        HorizontalAlignment="Stretch">
+                                <TextBlock Grid.Column="0" Text="{Binding Aperture}" Classes="muted" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding FocalLength}" Classes="muted" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Iso}" Classes="muted"/>
+                                <TextBlock Grid.Column="3" Text="{Binding ShutterSpeed}" Classes="muted"/>
+                            </Grid>
                             <ItemsControl ItemsSource="{Binding Metadata}"
-                                          Margin="5 0 0 0">
+                                          >
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:MetadataItem">
                                         <Grid ColumnDefinitions="Auto,*"
@@ -109,8 +141,22 @@
                             </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Command="{Binding}"></Button>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Border>
     </Grid>
+    <UserControl.Styles>
+        <Style Selector="Expander /template/ ToggleButton#ExpanderHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        
+        <Style Selector="Expander /template/ ToggleButton#ExpanderHeader:pointerover /template/ Border#Root">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+    </UserControl.Styles>
 </UserControl>

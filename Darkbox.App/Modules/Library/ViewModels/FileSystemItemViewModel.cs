@@ -2,8 +2,9 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Darkbox.Core.Interfaces;
+using Darkbox.ViewModels;
 
-namespace Darkbox.ViewModels;
+namespace Darkbox.Modules.Library.ViewModels;
 
 public partial class FileSystemItemViewModel : ViewModelBase
 {

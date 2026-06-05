@@ -40,5 +40,22 @@
         <Style Selector="TextBlock.muted">
             <Setter Property="Foreground" Value="#888888"/>
         </Style>
+        <Style Selector="Expander /template/ ToggleButton#ExpanderHeader">
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Style.Animations>
+                <Animation Duration="0"/>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="Expander /template/ ToggleButton#ExpanderHeader:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+        </Style>
+
+        <Style Selector="Expander /template/ ToggleButton#ExpanderHeader:pressed">
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+        </Style>
+        <Style Selector="Expander /template/ ToggleButton#ExpanderHeader:pointerover /template/ Border">
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+        </Style>
     </Application.Styles>
 </Application>

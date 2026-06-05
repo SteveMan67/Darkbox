@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Darkbox.Core.Interfaces;
 using Darkbox.Core.Services;
+using Darkbox.Modules.Library.ViewModels;
 using Darkbox.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,7 +23,7 @@ public partial class ImportDialogView : UserControl
 
             if (importService != null)
             {
-                _ = vm.LoadPreviewAsync(importService);
+                vm.LoadPreviewAsync(importService);
             }
         }
     }

@@ -8,6 +8,7 @@ public class Photo
     public long FileSizeInBytes { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
+    public int Orientation { get; set; }
     public int ShootId  { get; set; }
     
     // Camera Metadata
