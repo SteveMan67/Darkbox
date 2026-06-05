@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Darkbox.Core.Interfaces;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
 using Darkbox.Models;
 using Darkbox.Modules.Library.ViewModels;
 using Darkbox.ViewModels;
@@ -29,6 +30,20 @@ public partial class ImportDialogViewModel : ViewModelBase
         _fileSystemService = fileSystemService;
         _importService = importService;
         LoadRootDrives();
+    }
+
+    [RelayCommand]
+    private void Import()
+    {
+        
+    }
+    
+    public event Action? ImportDialogCloseRequested;
+
+    [RelayCommand]
+    private void CloseImportDialog()
+    {
+        ImportDialogCloseRequested.Invoke();
     }
     
     [ObservableProperty]

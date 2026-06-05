@@ -24,6 +24,12 @@ public partial class MainWindowViewModel : ViewModelBase
         };
         
         ImportDialog = importDialog;
+
+        ImportDialog.ImportDialogCloseRequested += () =>
+        {
+            IsImportDialogOpen = false;
+        };
+        
         _currentView = library;
         _ = library.LoadAsync();
     }

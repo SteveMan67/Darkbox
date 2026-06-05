@@ -142,7 +142,12 @@
                         </StackPanel>
                     </ScrollViewer>
                     <StackPanel Orientation="Horizontal">
-                        <Button Command="{Binding}"></Button>
+                        <Button Command="{Binding ImportCommand}">
+                            <TextBlock Text="Import"></TextBlock>
+                        </Button>
+                        <Button Command="{Binding CloseImportDialogCommand}">
+                            <TextBlock Text="Cancel"></TextBlock>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Grid>

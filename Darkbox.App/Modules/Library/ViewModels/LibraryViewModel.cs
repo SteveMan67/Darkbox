@@ -25,7 +25,7 @@ public partial class LibraryViewModel : ViewModelBase
 	}
 	
 	public event Action?  ImportDialogRequested;
-
+	
 	[RelayCommand]
 	private void OpenImportDialog()
 	{	
